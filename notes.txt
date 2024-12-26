@@ -1,0 +1,26 @@
+About channels when using faders:
+
+Documentation mentions two channels for faders in DAW
+- Channel 5, Control Changes: B4h (180): DAW Fader position sets.
+- Channel 6, Control Changes: B5h (181): DAW Fader colour sets.
+
+Experimenting with midi.py I found that when sending DAW to LP:
+- CH 5 will change the fader color only
+- CH 6 will change the fader value.
+
+So in theory, we want Ableton to do as follows:
+- DAW should use CH 6 for updating LP value
+- DAW should use CH 5 for color update
+- LP should send CH 5 for volume update
+
+Current issue is that DAW->LP changes colors but not the bar
+values, while LP->DAW actually does change the volume. Note that while 
+doing this, the colors also change, which suggests that DAW sends updates 
+to LP as well.
+
+Measuring current channel activity in Ableton confirms:
+- Entering volume mode, DAW->LP uses CH 6 to set color on all 8 LP faders. WRONG!
+- Modifying fader on LP, LP->DAW uses CH 5, and right after, DAW->LP sends
+  an update using CH 5 (which changes LP color). WRONG!
+- Modifying fader in Ableton, DAW->LP uses CH 5 (which changes LP color only). WRONG!
+
